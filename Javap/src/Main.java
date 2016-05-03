@@ -1,6 +1,7 @@
 import java.sql.SQLException;
 
 import Entidades.Cliente;
+import Entidades.Pedido;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -16,8 +17,14 @@ public class Main {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
 		
+		SupManager sp=new SupManager();
+		
+		Pedido p1=new Pedido("Juan",3);
+		
+		sp.enviar(p1);
+		
+		/*
 		// this uses h2 but you can change it to match your database
 		String databaseUrl = "jdbc:h2:mem:account";
 		// create a connection source to our database
@@ -61,6 +68,8 @@ public class Main {
 			e.printStackTrace();
 			
 		}
+		*/
+		
 	}
 
 }

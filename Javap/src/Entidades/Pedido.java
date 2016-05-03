@@ -1,20 +1,49 @@
 package Entidades;
 
+import Serialize.Seri;
+
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 
-@DatabaseTable(tableName = "pedidos")
+//@DatabaseTable(tableName = "pedidos")
 public class Pedido {
 
-	@DatabaseField(canBeNull = false)
-	int Cantidad;
-
-	public int getCantidad() {
-		return Cantidad;
+	public Pedido(String name,int cant)
+	{
+		setCantidad(cant);
+		setCliente(name);
+	}
+	//@DatabaseField(canBeNull = false)
+	public int id;
+	
+	public int getId() {
+		return id;
 	}
 
-	public void setCantidad(int cantidad) {
-		Cantidad = cantidad;
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	@Seri(name="cantidad")	
+	public int cantidad;
+
+	public int getCantidad() {
+		return cantidad;
+	}
+
+	public void setCantidad(int cant) {
+		cantidad = cant;
+	}
+	
+	@Seri(name="cliente")
+	public String cliente;
+
+	public String getCliente() {
+		return cliente;
+	}
+
+	public void setCliente(String cliente) {
+		this.cliente = cliente;
 	}
 	
 }
