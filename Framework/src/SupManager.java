@@ -53,6 +53,15 @@ public class SupManager {
 				}
 				
 			}
+			//---------------------------- FORMATEAR TRAMA EN JASON...
+			
+			
+			//------------------------- ENVIAR MEDIANTE REQUEST HTTP
+			
+			
+			
+			//------------------------ RECIBIR MEDIANTE RESPONSE HTTP
+			
 		}catch(Exception e)
 		{
 			System.out.println("Excetion: "+e);

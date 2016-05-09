@@ -2,6 +2,7 @@ import java.sql.SQLException;
 
 import Entidades.Cliente;
 import Entidades.Pedido;
+import Entidades.DeliveryLogic;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -22,7 +23,8 @@ public class Main {
 		
 		Pedido p1=new Pedido("Juan",3);
 		
-		sp.enviar(p1);
+		//sp.enviar(p1);
+		DeliveryLogic.enviar(p1);
 		
 		/*
 		// this uses h2 but you can change it to match your database
