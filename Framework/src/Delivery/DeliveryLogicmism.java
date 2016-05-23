@@ -1,6 +1,4 @@
-package Entidades;
-
-import com.j256.ormlite.table.DatabaseTable;
+package Delivery;
 
 import Annotation.Get;
 import Annotation.Post;
@@ -9,17 +7,17 @@ import Annotation.Servicios;
 
 //@DatabaseTable(tableName = "delivery")
 @Servicios(servicio = "")
-public class DeliveryLogic {
+public class DeliveryLogicmism {
 	
 	@Post(post="")
-	public boolean hacerAlgo(Pedido p1)
+	public boolean hacerAlgo(Pedidomism p1)
 	{
-		System.out.println("HICE ALGO");
+		
 		return true;
 	}
 
 	@Get(get="")
-	public boolean obtenerPedido(Pedido p1)
+	public boolean obtenerPedido(Pedidomism p1)
 	{
 		
 		return true;

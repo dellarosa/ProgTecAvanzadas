@@ -1,8 +1,14 @@
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -13,7 +19,7 @@ import Annotation.Get;
 import Annotation.Path;
 import Annotation.Post;
 import Annotation.Servicios;
-import Delivery.DeliveryLogic;
+import Delivery.DeliveryLogicmism;
 import Serialize.Seri;
 
 //@Path(path = "/Delivery")
@@ -26,14 +32,30 @@ public class Fmk {
 	Object obj=null;
 	boolean encontre=false;
 	//@Path(path = "/")
+	String PATHORIGINAL=null;
+	String folderDest=null;
+	String paqueteDest=null;
+	
+	public Fmk(String orig,String dest,String paqDest) {
+		// TODO Auto-generated constructor stub
+		PATHORIGINAL=orig;
+		folderDest=dest;
+		paqueteDest=paqDest;
+	}
+
+
 	public boolean superFrame( String folder)
 	{
 		int x=0;
 		
 		System.out.println(folder);
+		String realPathConPaquete=null;
 		
-		FindFile ff=new FindFile();
-		File[] files=ff.finder(folder);
+	//	FindFile ff=new FindFile();
+	//	File[] files=ff.finder(folder);
+		
+		File folders = new File(folder);
+		File[] files = folders.listFiles();
 		
 		/*	
 		bl.saveCustomer(customer);
@@ -48,22 +70,48 @@ public class Fmk {
 			System.out.println("NULLLLLLLLLLL");
 			return false;
 		}
+		
+		System.out.println("FILES: "+files.length);
+		
 		while(x<files.length)
-		{
+		{	
+			if(files[x].isDirectory())
+			{
+				realPathConPaquete=null;
+				realPathConPaquete=folder+"\\"+files[x].getName();
+				System.out.println("REALPATH: "+realPathConPaquete);
+				superFrame( realPathConPaquete);
+			}	
 			
-			//System.out.println("FILE: "+files[x].getName() + "   " + files[x].getName().substring(0, (files[x].getName().length()-5)));
+			String classname= files[x].getName().substring(0, (files[x].getName().length()-6));
 			
-			Class<?> cl = null;
+			System.out.println(" \nFILE: "+files[x].getName() + "   " + classname);
+			
+			if(!(classname.equals("DeliveryLogic")))
+			{
+				x++;
+				continue;
+			}
 				
+			//Class<?> cl = null;
+			Class cl = null;
+			System.out.println("\nPATH:"+System.getProperty("user.dir"));
+					
 			try {
-				//cl=Class.forName("D:\\workspace\\Framework\\src\\Delivery\\DeliveryLogic.java");
-				//cl=Class.forName("Delivery"+"DeliveryLogic");
-				cl=Class.forName("Delivery."+files[x].getName().substring(0, (files[x].getName().length()-5)));
+				
+				File fd=new File(PATHORIGINAL);
+				URL[] cp = {fd.toURI().toURL()};				
+				URLClassLoader urlcl = new URLClassLoader(cp);
+				cl= urlcl.loadClass("Entidades."+classname);
+				
+				System.out.println(cl.toString());
 				//cl=Class.forName( files[x].getName().substring(0, (files[x].getName().length()-5)));
 				
-			} catch (ClassNotFoundException e1) {
+				
+			} catch (ClassNotFoundException | MalformedURLException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
+				System.out.println("Exception URL: "+e1);
 				return false;
 			}
 			//------------- RECORRER PATH PARA BUSCAR CLASES
@@ -71,8 +119,9 @@ public class Fmk {
 			//obj=Class.forName("Pedido");	//Harcodead, futuramente dinamico
 			
 			
-			String strClass="@Path(\"/Delivery\")public Class DeliveryService{ \n"+ 
-			"private "+ cl.getName()+" dl = new"+ cl.getName()+"(); ";	
+			//String strClass="@Path(\"/Delivery\")public Class DeliveryService{ \n"+
+			String strClass="package "+paqueteDest +";\n" +"public class DeliveryService{ \n"+
+			"private "+ cl.getName()+" dl = new "+ cl.getName()+"(); \n";	
 			
 			
 			
@@ -94,7 +143,10 @@ public class Fmk {
 					
 				}
 				if(encontre==false)
+				{
+					x++;
 					continue;
+				}
 				
 				//------------------------------------------------------------
 				for(Method f : cl.getDeclaredMethods())
@@ -109,16 +161,42 @@ public class Fmk {
 							strClass+="\n public "+f.getReturnType().getName()+" "+f.getName()+"(";
 							
 							int i=0;
-							
-							for(i=0;i<f.getParameterCount();i++)
+							try
 							{
-								TypeVariable<Method>[] tvs =f.getTypeParameters();
+								System.out.println("Cantidad: "+f.getParameterCount());
+								for(i=0;i<f.getParameterCount();i++)
+								{
+									
+									Type[] tvs =f.getGenericParameterTypes();
+									
+									System.out.println("TipoParametro: "+f.getGenericParameterTypes());
+									
+									strClass+=tvs[i].getTypeName()+" a"+String.valueOf(i);
+									if((i+1) <f.getParameterCount())  strClass+=", ";									
+									
+								}
+							}catch(Exception ex)
+							{
+								System.out.println("Excetion Paramets: "+ex);
+								return false;
+							}
 								
-								strClass+=tvs[i].getName()+" a"+String.valueOf(i);
+							strClass+="){\n";
+						
+							strClass+="return dl."+f.getName().toString()+"(";
+							int j=0;
+							for(j=0;j<i;j++)
+							{
+								if((j+1) <i) 
+									strClass+="a"+String.valueOf(j)+", ";
+								else
+									strClass+="a"+String.valueOf(j);
 								
 							}
+								
+							strClass+=");";
 							
-							strClass+="){";
+							strClass+="\n}";
 							
 						//	lstJasonReq.add(f.getName().toString() + " = " + f.get(obj));
 						//	System.out.println(f.getName().toString() + " = " + f.get(obj));
@@ -127,11 +205,11 @@ public class Fmk {
 						{
 							strClass+="";
 						}
-						strClass+="dl."+f.getName().toString();
-						strClass+="}";
+						
 					}
 					
 				}
+				/*
 				//-------------------------------------------------------------------
 				//Field field=null;
 				for(Field f : cl.getDeclaredFields())
@@ -159,6 +237,7 @@ public class Fmk {
 					}
 					
 				}
+				*/
 				//---------------------------- FORMATEAR TRAMA EN JASON...
 				
 				
@@ -167,14 +246,29 @@ public class Fmk {
 				
 				
 				//------------------------ RECIBIR MEDIANTE RESPONSE HTTP
+				strClass+="\n}";
+			
+				System.out.println("CLASS: "+strClass);
+				
+				try {
+					//File file = new File("DeliveryService.java");
+					File file = new File(folderDest+"\\"+"DeliveryService.java");
+					FileWriter fileWriter = new FileWriter(file);
+					fileWriter.write(strClass);					
+					fileWriter.flush();
+					fileWriter.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+					return false;
+				}
 				
 			}catch(Exception e)
 			{
-				System.out.println("Excetion: "+e);
+				System.out.println("Excetion Gral: "+e);
 				
 			}
 		
-			System.out.println("CLASS: "+strClass);
+			
 			
 			/*
 			try {
@@ -190,6 +284,8 @@ public class Fmk {
 			*/
 			x++;
 		}
+		
+		
 		
 		/*
 		Method enviar= null;		//Tiene que tener el nombre exacto sino no funciona

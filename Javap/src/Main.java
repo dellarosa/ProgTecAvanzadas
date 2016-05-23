@@ -23,8 +23,10 @@ public class Main {
 		
 		Pedido p1=new Pedido("Juan",3);
 		
+		DeliveryLogic dl=new DeliveryLogic();
+		dl.hacerAlgo(p1);
 		//sp.enviar(p1);
-		DeliveryLogic.enviar(p1);
+		//DeliveryLogic.enviar(p1);
 		
 		/*
 		// this uses h2 but you can change it to match your database
