@@ -28,7 +28,7 @@ public class AnalizadorJava {
 		int iAux = 0;
 		int iAux2 = 0;
 		
-		System.out.println(archivo);
+		System.out.println("\n\n\n*********************\n"+archivo);
 		
 		this.workspace = Configuracion.getInstancia().getWorkspace();
 		this.proyecto = Configuracion.getInstancia().getProyectoOrigen();
@@ -38,17 +38,48 @@ public class AnalizadorJava {
 		
 		this.nombre = archivo.substring(iAux +1, iAux2);
 		iAux2 = (Configuracion.getInstancia().carpetaOrigenBIN()).length();
-		this.paqueteDir = archivo.substring(iAux2, iAux); 
-		this.paquete = paqueteDir.replace('\\', '.');
+	//	System.out.println("ARchivo: " + this.nombre + "LEN: "+ iAux + "LEN 2: "+iAux2);
 		
-		System.out.println("Procesando archivo: " + this.nombre);		
+		if(iAux>iAux2)
+		{	
+			this.paqueteDir = archivo.substring(iAux2, iAux);
+			this.paquete = paqueteDir.replace('\\', '.');
+		}
+		else
+		{
+			this.paqueteDir = "";
+			this.paquete = "";
+		}
+		
+		
+		System.out.println("Procesando archivo: " + this.nombre + " PAQUETE: "+paquete);		
 	}
 
 	public void compilar(){
-		String archivoIN = Configuracion.getInstancia().carpetaOrigenSRC() + paqueteDir + "\\" + nombre + ".java";
-		String archivoOUT = Configuracion.getInstancia().carpetaOrigenBIN() + paqueteDir + "\\" + nombre + ".class";
-		System.out.println("Compilando archivo: " + archivoIN + "\n a:" + archivoOUT);
 		
+		String archivoOUT=null;
+		String archivoIN =null;
+		
+		try
+		{
+			
+			if(!paqueteDir.equals(""))
+			{
+				archivoIN = Configuracion.getInstancia().carpetaOrigenSRC() + paqueteDir + "\\" + nombre + ".java";
+			
+				archivoOUT = Configuracion.getInstancia().carpetaOrigenBIN() + paqueteDir + "\\" + nombre + ".class";
+				System.out.println("Compilando archivo: " + archivoIN + "\n a:" + archivoOUT);
+			}else
+			{
+				archivoIN = Configuracion.getInstancia().carpetaOrigenSRC() +  nombre + ".java";
+				
+				archivoOUT = Configuracion.getInstancia().carpetaOrigenBIN() + nombre + ".class";
+				System.out.println("Compilando archivo: " + archivoIN + "\n a: " + archivoOUT);
+			}
+		}catch(Exception e)
+		{
+			System.out.println("ERROR OBTENIENDO SRC: "+e);
+		}
 //		TODO ESTO NO ANDA!!!!!
 //		
 //		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -66,31 +97,86 @@ public class AnalizadorJava {
 
 //TODO 	Esto solo copia el compilado del proyecto de origen hay que sacarlo
 //		Si es que el proyecto Origen está compilado
-String temp = Configuracion.getInstancia().carpetaOrigenBIN() + paqueteDir + "\\" + nombre + ".class";
-Archivo file = new Archivo(temp);
-file.copiarArchivo(archivoOUT);
+		String temp=null;
+		if(!paqueteDir.equals(""))
+		{
 		
+			 temp= Configuracion.getInstancia().carpetaOrigenBIN() + paqueteDir + "\\" + nombre + ".class";
+		}
+		else
+		{
+			temp = Configuracion.getInstancia().carpetaOrigenBIN() + nombre + ".class";
+		}
+		
+		Archivo file = new Archivo(temp);
+		file.copiarArchivo(archivoOUT);
+		
+		//System.out.println("TEMP: "+temp);
 	}
 	
-	public Class<?> instanciar(){
-		Class<?> ret = null;
+	//public Class<?> instanciar(){
+	public Class instanciar(){
+		//Class<?> ret = null;
+		Class ret = null;
 		URLClassLoader cl = null;
 		URL[] urlList = new URL[1];
-		try {
+		try 
+		{
 //	TODO	Una vez que compile ... aca tiene que ir el proyecto de destino 
-			File file = new File(workspace + "\\" + proyecto);
-			urlList[0] = new URL(file.toURI().toURL(),"bin\\");;
+			String strFile=workspace + "\\" + proyecto;
+			
+			System.out.println("\n**STRFILE: "+strFile);
+			
+			File file = new File(strFile);
+		/*
+			if(file==null)
+				System.out.println("FILE NULL");
+			else
+				System.out.println("URL: "+file.toURI().toURL());
+			*/
+			urlList[0] = new URL(file.toURI().toURL(),"bin\\");
+			
+			System.out.println("URL LIST: "+urlList[0]);
+			
 			cl = new URLClassLoader(urlList);
-			ret = cl.loadClass(paquete + "." + nombre);
+			if(cl==null)
+				System.out.println("CL NULL");
+			
+			System.out.println("paquete: "+paquete);
+			System.out.println("NOMBREPAC: "+nombre);
+			
+			System.out.println("GETFILE: "+urlList[0]+nombre+".class" );
+			File file2=null;
+			if(!paquete.equals(""))
+				file2 = new File(strFile+"//"+"bin//"+paquete+"//"+nombre+".class");
+			else
+				file2= new File(strFile+"//"+"bin//"+nombre+".class");
+				
+			
+			//File file2 = new File(urlList[0]+nombre+".class");
+			System.out.println("\n**PATH: "+ file2.getAbsolutePath() +" -\nLEN: "+file2.length() );
+			if(file2.length()<=0)
+				return null;
+			
+			
+			if(!paquete.equals(""))				
+				ret = cl.loadClass(paquete + "." + nombre);
+			else
+			{	
+				//ret = cl.loadClass("default package" +"." + nombre);
+				ret = cl.loadClass(nombre);
+			}
 		} catch (MalformedURLException | ClassNotFoundException e) {
-			System.out.println("Error al instanciar la clase: ");
+			System.out.println("****Error al instanciar la clase: ");
 			e.printStackTrace();
 		} finally{
 			try {
 				if (cl != null) cl.close();
 			} catch (IOException e) {
+				System.out.println("EXCPTION INSTANCIA: "+e);
 				e.printStackTrace();
 			}
+			System.out.println("PASEFIN");
 		}
 		return ret;
 	}
@@ -162,29 +248,59 @@ file.copiarArchivo(archivoOUT);
 		}
 	}
 	
-	public void procesar(Class<?> clase){
+	//public void procesar(Class<?> clase){
+	public void procesar(Class clase){
 //	TODO	Si no hay mas anotaciones en la clase mas que service se puede reemplazar
 //			tanto el for como el if siguientes!!!!
 //			if (clase.isAnnotationPresent(Servicio.class)){}
+		
+		System.out.println("NAMECLASS: "+clase.getName());
+		
 		for (Annotation anotacion : clase.getAnnotations()){
+			
 			if (anotacion instanceof Servicio){
-				file = new ArchivoJava(clase.getSimpleName() + "Serve", Configuracion.getInstancia().getPaqueteGenerado());
-				file.addInclude(clase.getName());
-				file.addVariable(file.visibilidadPrivate(), clase, "original", null);
-				file.addCreacional();
-				generarConstructores(clase.getConstructors());
-				for (Method metodo: clase.getDeclaredMethods())
-					analizarMetodo(metodo);
+				try
+				{
+					String strArchivojava=clase.getSimpleName() + "Serve";
+					System.out.println("ARCHIVOJAVA: "+strArchivojava+" PAQUETE:"+Configuracion.getInstancia().getPaqueteGenerado());
+					file = new ArchivoJava(strArchivojava, Configuracion.getInstancia().getPaqueteGenerado());
+					
+					file.addInclude(clase.getName());
+					file.addVariable(file.visibilidadPrivate(), clase, "original", null);
+					file.addCreacional();				
+					generarConstructores(clase.getConstructors());
+				}catch(Exception exi)
+				{
+					System.out.println("ANOT EXCEPTION: "+exi);
+				}
+				
+				try
+				{
+					System.out.println("METODOS LEN: "+clase.getDeclaredFields().length);
+					System.out.println("METODOS LEN: "+clase.getMethods().length);
+				
+					//for (Method metodo: clase.getDeclaredMethods())
+					//	analizarMetodo(metodo);
+				}catch(Exception ex)
+				{
+					System.out.println("METODOS EXCEPTION: "+ex);
+				}
 				file.generarJava();
 			}
 		}
 	}
 
-	public void copiarArchivoDestino(){
+	public void copiarArchivoDestino()
+	{
+		
 		Configuracion conf = Configuracion.getInstancia();
+		
+		//System.out.println("{copiarArchivoDest} - PAK: "+paqueteDir + " - NOMBRE: "+nombre);		
 		String origen = conf.carpetaOrigenSRC() + paqueteDir + "\\" + nombre + ".java";
-		String destino = conf.carpetaDestinoSRC() + paqueteDir + "\\" + nombre + ".java";
+		String destino = conf.carpetaDestinoSRC() + paqueteDir + "\\" + nombre + ".java";		
+		//System.out.println("{copiarArchivoDest} - ORIGEN: "+origen + " - DESTIINO: "+destino);		
 		Archivo file = new Archivo(origen);
+		
 		file.copiarArchivo(destino);
 	}
 }

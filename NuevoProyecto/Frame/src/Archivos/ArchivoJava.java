@@ -42,7 +42,7 @@ public class ArchivoJava {
 		proyecto = Configuracion.getInstancia().getProyectoDestino();
 		this.nombre = nombre;
 		this.setPaquete(paquete); 
-		System.out.println(nombre);
+		//System.out.println(nombre);
 	}
 	
 	private ArrayList<String> includes = null;
@@ -158,7 +158,7 @@ public class ArchivoJava {
 	}
 	
 	public void addCreacional(){
-		System.out.println(nombre);
+		//System.out.println(nombre);
 		tipoMetodo nuevo = new tipoMetodo();
 		nuevo.visible = this.visibilidadPublic();
 		nuevo.tipo = void.class;
@@ -207,7 +207,7 @@ public class ArchivoJava {
 		else 
 			meto = this.buscarMetodo(metodo);
 
-		System.out.println(meto.nombre);
+		//System.out.println(meto.nombre);
 		if (meto.argumentos == null) meto.argumentos = new ArrayList<tipoArg>();
 		
 		meto.argumentos.add(argumentoNuevo(tipo, nombre));
@@ -221,7 +221,7 @@ public class ArchivoJava {
 			meto = this.buscarMetodo(metodo);
 		
 		if (meto.codigo == null) meto.codigo = new ArrayList<String>();
-		System.out.println(instr);
+		//System.out.println(instr);
 		meto.codigo.add(instr);
 	}
 	

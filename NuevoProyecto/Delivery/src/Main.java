@@ -1,8 +1,13 @@
+
+
 import java.sql.SQLException;
 
-import Entidades.Cliente;
-import Entidades.Pedido;
-import Entidades.DeliveryLogic;
+
+
+
+
+import zentidades.DeliveryLogic;
+import zentidades.Pedido;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -19,7 +24,7 @@ public class Main {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		
-		SupManager sp=new SupManager();
+	//	SupManager sp=new SupManager();
 		
 		Pedido p1=new Pedido("Juan",3);
 		

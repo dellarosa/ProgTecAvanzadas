@@ -69,7 +69,10 @@ public class Archivo {
 		FileChannel destino = null;
 	 
 	    try {
-	    	if(!destinoFile.exists()) destinoFile.createNewFile();
+	    	
+	    	//System.out.println("****" + destinoFile.getAbsolutePath());
+	    	if(!destinoFile.exists()) 
+	    		destinoFile.createNewFile();
 
 	    	fileInputStream = new FileInputStream(archivo);
 	        fileOutputStream = new FileOutputStream(destinoFile);

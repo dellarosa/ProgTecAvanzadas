@@ -1,4 +1,4 @@
-package Entidades;
+package zentidades;
 
 import com.j256.ormlite.table.DatabaseTable;
 

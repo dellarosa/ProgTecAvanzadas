@@ -1,9 +1,5 @@
-package Entidades;
+package zentidades;
 
-import Serialize.Seri;
-
-import com.j256.ormlite.field.DatabaseField;
-import com.j256.ormlite.table.DatabaseTable;
 
 //@DatabaseTable(tableName = "pedidos")
 public class Pedido {
@@ -24,7 +20,7 @@ public class Pedido {
 		this.id = id;
 	}
 
-	@Seri(name="cantidad")	
+	//@Seri(name="cantidad")	
 	public int cantidad;
 
 	public int getCantidad() {
@@ -35,7 +31,7 @@ public class Pedido {
 		cantidad = cant;
 	}
 	
-	@Seri(name="cliente")
+	//@Seri(name="cliente")
 	public String cliente;
 
 	public String getCliente() {

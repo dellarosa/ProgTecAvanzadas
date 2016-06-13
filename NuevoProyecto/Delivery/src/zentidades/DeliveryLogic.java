@@ -1,18 +1,21 @@
-package Entidades;
+package zentidades;
 
 import com.j256.ormlite.table.DatabaseTable;
 
 import Annotation.Get;
 import Annotation.Post;
-import Annotation.Servicios;
+import Annotation.Servicio;
+
+
 
 
 //@DatabaseTable(tableName = "delivery")
-@Servicios(servicio = "")
+@Servicio(servicio = "")
 public class DeliveryLogic {
 	
 	@Post(post="")
 	public boolean hacerAlgo(Pedido p1)
+	//public boolean hacerAlgo()
 	{
 		System.out.println("HICE ALGO");
 		return true;
@@ -20,6 +23,7 @@ public class DeliveryLogic {
 
 	@Get(get="")
 	public boolean obtenerPedido(Pedido p1)
+	//public boolean obtenerPedido()
 	{
 		
 		return true;
