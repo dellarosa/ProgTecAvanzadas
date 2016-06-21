@@ -4,7 +4,9 @@ import java.io.IOException;
 import Archivos.ArchivoLectura;
 
 public class Configuracion {
-	static final String ARCHIVO_DE_CONFIGURACION = "D:\\workspace\\Frame\\src\\conf.ini";
+	//static final String ARCHIVO_DE_CONFIGURACION = "D:\\workspace\\Frame\\src\\conf.ini";
+	static final String ARCHIVO_DE_CONFIGURACION = "C:\\Documents and Settings\\"
+			+ "f.dellarosa.PPAR-PC12\\Mis documentos\\_DropboxOLD\\Public\\UP\\4 Año 1 Cuatri\\Tecnicas avanzadas de prog\\Rposi\\ProgTecAvanzadas\\trunk\\NuevoProyecto\\Frame\\src\\conf.ini";
 	private static Configuracion instancia = null;
 	
 	private String proyectoOrigen;

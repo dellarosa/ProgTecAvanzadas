@@ -26,4 +26,8 @@ public class DeliveryLogicServe{
 	}
 
 // METODOS
+	public boolean hacerAlgo(zentidades.Pedido arg0) {
+		return original.hacerAlgo(arg0);
+	}
+
 }

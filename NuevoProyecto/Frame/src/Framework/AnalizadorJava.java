@@ -170,14 +170,19 @@ public class AnalizadorJava {
 			System.out.println("****Error al instanciar la clase: ");
 			e.printStackTrace();
 		} finally{
-			try {
-				if (cl != null) cl.close();
+			/*try {
+				if (cl != null) 
+				{	;//cl.close();					
+				}
+				
 			} catch (IOException e) {
 				System.out.println("EXCPTION INSTANCIA: "+e);
 				e.printStackTrace();
 			}
+			*/
 			System.out.println("PASEFIN");
 		}
+	
 		return ret;
 	}
 	
@@ -186,7 +191,7 @@ public class AnalizadorJava {
 		int iAux = 0;
 		
 		// Agregando Metodo
-		file.addMetodo(file.visibilidadPublic(), metodo.getReturnType(), metodo.getName());
+		file.addMetodo(file.visibilidadPublic(), metodo.getReturnType(), metodo.getName(),"@POST");
 		
 		// Agregando Argumentos
 		iAux = 0;
@@ -209,7 +214,10 @@ public class AnalizadorJava {
 		System.out.println("GET");
 		//TODO ver que hace
 	}
-	
+	public void annotationPath(Method metodo){
+		System.out.println("PATH");
+		//TODO ver que hace
+	}
 	private void analizarMetodo(Method metodo){
 		System.out.println("Analizando metodo: " + metodo.getName());
 		for (Annotation anotacion : metodo.getDeclaredAnnotations()){
@@ -218,7 +226,10 @@ public class AnalizadorJava {
 			else if (anotacion instanceof Get)
 				annotationGet(metodo);
 			else if (anotacion instanceof Path)
+			{	
+				annotationPath(metodo);
 				System.out.println("PATH");
+			}
 			else 
 				System.out.println("Anotacion desconocida: " + anotacion);
 		}
@@ -257,13 +268,18 @@ public class AnalizadorJava {
 		System.out.println("NAMECLASS: "+clase.getName());
 		
 		for (Annotation anotacion : clase.getAnnotations()){
-			
 			if (anotacion instanceof Servicio){
 				try
 				{
 					String strArchivojava=clase.getSimpleName() + "Serve";
 					System.out.println("ARCHIVOJAVA: "+strArchivojava+" PAQUETE:"+Configuracion.getInstancia().getPaqueteGenerado());
 					file = new ArchivoJava(strArchivojava, Configuracion.getInstancia().getPaqueteGenerado());
+					
+					file.addInclude(clase.getName());
+					//------annotations lib
+					file.addInclude("javax.ws.rs.GET");
+					file.addInclude("javax.ws.rs.POST");
+					file.addInclude("javax.ws.rs.Path");
 					
 					file.addInclude(clase.getName());
 					file.addVariable(file.visibilidadPrivate(), clase, "original", null);
@@ -276,17 +292,18 @@ public class AnalizadorJava {
 				
 				try
 				{
-					System.out.println("METODOS LEN: "+clase.getDeclaredFields().length);
+					System.out.println("FIELDS LEN: "+clase.getDeclaredFields().length);
 					System.out.println("METODOS LEN: "+clase.getMethods().length);
 				
-					//for (Method metodo: clase.getDeclaredMethods())
-					//	analizarMetodo(metodo);
+					for (Method metodo: clase.getDeclaredMethods())
+						analizarMetodo(metodo);
 				}catch(Exception ex)
 				{
 					System.out.println("METODOS EXCEPTION: "+ex);
 				}
 				file.generarJava();
 			}
+			
 		}
 	}
 

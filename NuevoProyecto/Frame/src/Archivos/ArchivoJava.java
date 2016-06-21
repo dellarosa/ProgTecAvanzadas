@@ -29,6 +29,8 @@ public class ArchivoJava {
 		public ArrayList<String> codigo = null;
 		public ArrayList<tipoArg> argumentos = null;
 		public String toString(){return nombre;}
+		//public int annotation=0;
+		public String annotation=null;
 	}
 
 	protected String workspace = null;
@@ -190,13 +192,14 @@ public class ArchivoJava {
 		return ret;
 	}
 		
-	public void addMetodo(visibilidad newVisibilidad, Class<?> clase, String nombre){
+	public void addMetodo(visibilidad newVisibilidad, Class<?> clase, String nombre,String strAnnotation){
 		tipoMetodo nuevo = new tipoMetodo();
 		nuevo.visible = newVisibilidad;
 		nuevo.tipo = clase;
 		nuevo.nombre = nombre;
 		nuevo.codigo = new ArrayList<String>();
 		nuevo.argumentos = new ArrayList<tipoArg>();
+		nuevo.annotation=strAnnotation;
 		this.addMetodo(nuevo);
 	}
 	
@@ -212,7 +215,20 @@ public class ArchivoJava {
 		
 		meto.argumentos.add(argumentoNuevo(tipo, nombre));
 	}
-
+	
+	public void addPost()
+	{
+		
+	}
+	
+	public void addGet()
+	{
+		
+	}
+	public void addPath()
+	{
+		
+	}
 	public void addCodigo(String metodo, String instr){
 		tipoMetodo meto = null;
 		if (metodo == lastCreacional.nombre)
@@ -242,6 +258,8 @@ public class ArchivoJava {
 	
 	private String getMetodo(tipoMetodo proc){
 		String ret = "";
+		
+		ret+="\t"+proc.annotation+"\n";
 		if (proc.visible == visibilidad.Tprivate)   ret += "\tprivate";
 		if (proc.visible == visibilidad.Tprotected) ret += "\tprotected";
 		if (proc.visible == visibilidad.Tpublic)    ret += "\tpublic";
@@ -310,6 +328,7 @@ public class ArchivoJava {
 					javaFile.escribir(getConstantes());
 					javaFile.escribir(getVariables());
 					javaFile.escribir(getCreacional());
+					//---
 					javaFile.escribir(getMetodos());
 					javaFile.escribir("}\n");
 			
