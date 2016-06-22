@@ -1,5 +1,4 @@
 
-
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -18,7 +17,7 @@ import org.glassfish.jersey.server.ResourceConfig;
 // The browser requests per default the HTML MIME type.
 
 //Sets the path to base URL + /hello
-@ApplicationPath("resources")
+@ApplicationPath("/*")
 @Path("/hello")
 public class Hello extends ResourceConfig {
 
