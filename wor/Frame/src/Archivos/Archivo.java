@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.net.*;
 
+import Framework.Configuracion;
+
 public class Archivo {
 	protected File archivo;
 	private FileInputStream fileInputStream;
@@ -104,23 +106,41 @@ public class Archivo {
     	return ret;
     }
 
-    public List<String> listarArchivos(String extencion){
-    	List<String> ret = null;
+    public ArrayList<String> listarArchivos(String extencion){
+    	ArrayList<String> ret = null;
     	String sAux = null;
     	
     	if (archivo.isDirectory()){
     		ret = new ArrayList<String>();
     		
     		for (File arch: archivo.listFiles()){
+      			
     			if (arch.isDirectory()){
     				Archivo dir = new Archivo(arch.getAbsolutePath());
     				ret.addAll(dir.listarArchivos(extencion));
     			}
     			else{
     				sAux = arch.getAbsolutePath();
+    			//	System.out.println("PArchivo: "+ sAux);
+    				/*switch(sAux)
+    				{
+    					
+    					case "C:\\Documents and Settings\\f.dellarosa.PPAR-PC12\\Mis documentos\\_DropboxOLD\\Public\\UP\\4 Año 1 Cuatri\\Tecnicas avanzadas de prog\\Rposi\\ProgTecAvanzadas\\trunk\\wor\\RestServer\\src\\Main.java":
+    					case "C:\\Documents and Settings\\f.dellarosa.PPAR-PC12\\Mis documentos\\_DropboxOLD\\Public\\UP\\4 Año 1 Cuatri\\Tecnicas avanzadas de prog\\Rposi\\ProgTecAvanzadas\\trunk\\wor\\RestServer\\src\\DeliveryLogic.java":
+    					case "C:\\Documents and Settings\\f.dellarosa.PPAR-PC12\\Mis documentos\\_DropboxOLD\\Public\\UP\\4 Año 1 Cuatri\\Tecnicas avanzadas de prog\\Rposi\\ProgTecAvanzadas\\trunk\\wor\\RestServer\\src\\Delivery.java":
+    					case "C:\\Documents and Settings\\f.dellarosa.PPAR-PC12\\Mis documentos\\_DropboxOLD\\Public\\UP\\4 Año 1 Cuatri\\Tecnicas avanzadas de prog\\Rposi\\ProgTecAvanzadas\\trunk\\wor\\RestServer\\src\\Cliente.java":
+    					case "C:\\Documents and Settings\\f.dellarosa.PPAR-PC12\\Mis documentos\\_DropboxOLD\\Public\\UP\\4 Año 1 Cuatri\\Tecnicas avanzadas de prog\\Rposi\\ProgTecAvanzadas\\trunk\\wor\\RestServer\\src\\Pedido.java":	
+    					//case ((String)(Configuracion.getInstancia().carpetaDestinoSRC()+"Main.java")):
+    					int iAux =sAux.lastIndexOf(".");
+    					if (sAux.substring(iAux+1).endsWith(extencion))
+    						ret.add(arch.getAbsolutePath());
+    					break;
+    					default:
+    					break;
+    				}*/
     				int iAux =sAux.lastIndexOf(".");
-    				if (sAux.substring(iAux+1).endsWith(extencion))
-   					ret.add(arch.getAbsolutePath());
+					if (sAux.substring(iAux+1).endsWith(extencion))
+						ret.add(arch.getAbsolutePath());
     			}
     		}
     		

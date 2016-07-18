@@ -1,0 +1,5 @@
+tap\exampleapp\client\TestApp.class
+tap\exampleapp\logic\Customer.class
+tap\generated\client\CustomerProxy.class
+tap\exampleapp\logic\BusinessLogic.class
+tap\generated\server\Hello.class

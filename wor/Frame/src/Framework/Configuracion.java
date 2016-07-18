@@ -1,13 +1,14 @@
 package Framework;
+import java.io.File;
 import java.io.IOException;
 
 import Archivos.ArchivoLectura;
 
 public class Configuracion {
-	//static final String ARCHIVO_DE_CONFIGURACION = "D:\\workspace\\Frame\\src\\conf.ini";
-//	static final String ARCHIVO_DE_CONFIGURACION = "C:\\Documents and Settings\\"
-//			+ "f.dellarosa.PPAR-PC12\\Mis documentos\\_DropboxOLD\\Public\\UP\\4 Año 1 Cuatri\\Tecnicas avanzadas de prog\\Rposi\\ProgTecAvanzadas\\trunk\\NuevoProyecto\\Frame\\src\\conf.ini";
-	static final String ARCHIVO_DE_CONFIGURACION = "D:\\wor\\Frame\\src\\conf.ini";
+//	static final String ARCHIVO_DE_CONFIGURACION = "/home/mithos/Documentos/Proyectos/Labo1/Workspace/Frame/src/conf.ini";
+static final String ARCHIVO_DE_CONFIGURACION = "C:\\Documents and Settings\\"
+			+ "f.dellarosa.PPAR-PC12\\Mis documentos\\_DropboxOLD\\Public\\UP\\4 Año 1 Cuatri\\Tecnicas avanzadas de prog\\Rposi\\ProgTecAvanzadas\\trunk\\wor\\Frame\\src\\conf.ini";
+//	static final String ARCHIVO_DE_CONFIGURACION = "D:\\wor\\Frame\\src\\conf.ini";
 	private static Configuracion instancia = null;
 	
 	private String proyectoOrigen;
@@ -36,19 +37,23 @@ public class Configuracion {
 	}
 	
 	public String carpetaOrigenSRC(){
-		return workspace + "\\" + proyectoOrigen + "\\" + carpetaJAVA + "\\";
+		return workspace + File.separator + proyectoOrigen + File.separator + carpetaJAVA + File.separator;
 	}
 	
 	public String carpetaDestinoSRC(){
-		return workspace + "\\"  + proyectoDestino + "\\" + carpetaJAVA + "\\";
+		//return workspace + File.separator  + proyectoDestino + File.separator + carpetaJAVA + File.separator;
+		return workspace + File.separator  + proyectoDestino + File.separator + carpetaJAVA + File.separator+ "main"+ File.separator+"java"+ File.separator+"tap"+File.separator+"generated"+File.separator+"code";
 	}
 	
 	public String carpetaOrigenBIN(){
-		return workspace + "\\"  + proyectoOrigen + "\\" + carpetaCLASS + "\\";
+		return workspace + File.separator  + proyectoOrigen + File.separator + carpetaCLASS + File.separator;
 	}
 	
 	public String carpetaDestinoBIN(){
-		return workspace + "\\"  + proyectoDestino + "\\" + carpetaCLASS + "\\";
+		//return workspace + File.separator  + proyectoDestino + File.separator + carpetaCLASS + File.separator;
+		//return workspace + File.separator  + proyectoDestino + File.separator + carpetaCLASS + File.separator+ "tap"+File.separator+"generated"+File.separator+"code";
+		//return workspace + File.separator  + proyectoDestino + File.separator + carpetaJAVA + File.separator+ "main"+ File.separator+"java"+ File.separator+"tap"+File.separator+"generated"+File.separator+"code";
+		return workspace + File.separator  + proyectoDestino + File.separator + carpetaJAVA + File.separator+ "main"+ File.separator+"java"+ File.separator;
 	}
 	
 	public Configuracion(String arch){
@@ -103,7 +108,7 @@ public class Configuracion {
 			}
 			
 		} catch (IOException e) {
-			System.out.println("Error cargando configuración");
+			System.out.println("Error cargando configuraciï¿½n");
 			e.printStackTrace();
 		}finally{
 			try {conf.cerrar();}
@@ -112,4 +117,7 @@ public class Configuracion {
 		
 	}
 
+	public String Carpeta2Pack(String arg){
+		return arg.replace(File.separatorChar, '.');
+	}
 }

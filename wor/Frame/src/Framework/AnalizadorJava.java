@@ -8,13 +8,21 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.ToolProvider;
 
 import Annotation.Get;
 import Annotation.Path;
 import Annotation.Post;
 import Annotation.Servicio;
-import Archivos.Archivo;
+import Archivos.ArchivoEscritura;
 import Archivos.ArchivoJava;
+import Archivos.ArchivoLectura;
 
 public class AnalizadorJava {
 	private String workspace = null;
@@ -31,9 +39,9 @@ public class AnalizadorJava {
 		System.out.println("\n\n\n*********************\n"+archivo);
 		
 		this.workspace = Configuracion.getInstancia().getWorkspace();
-		this.proyecto = Configuracion.getInstancia().getProyectoOrigen();
+		this.proyecto = Configuracion.getInstancia().getProyectoDestino();
 
-		iAux  = archivo.lastIndexOf('\\');
+		iAux  = archivo.lastIndexOf(File.separatorChar);
 		iAux2 = archivo.lastIndexOf('.');
 		
 		this.nombre = archivo.substring(iAux +1, iAux2);
@@ -43,7 +51,7 @@ public class AnalizadorJava {
 		if(iAux>iAux2)
 		{	
 			this.paqueteDir = archivo.substring(iAux2, iAux);
-			this.paquete = paqueteDir.replace('\\', '.');
+			this.paquete = Configuracion.getInstancia().Carpeta2Pack(paqueteDir);
 		}
 		else
 		{
@@ -55,75 +63,55 @@ public class AnalizadorJava {
 		System.out.println("Procesando archivo: " + this.nombre + " PAQUETE: "+paquete);		
 	}
 
-	public void compilar(){
+	public static void compilar(ArrayList<String> javaSTRFiles, String destino){
+//		boolean success = false;
 		
-		String archivoOUT=null;
-		String archivoIN =null;
-		
-		try
-		{
+		System.out.println("PASE Compilar Lista: "+javaSTRFiles.size());
+		System.out.println("PATH DESTINO CLASS:  "+destino);
+		try {
+			ArrayList<String> compileOptions = new ArrayList<String>();
+			compileOptions.add("-d");
+			compileOptions.add(destino);
 			
-			if(!paqueteDir.equals(""))
-			{
-				archivoIN = Configuracion.getInstancia().carpetaOrigenSRC() + paqueteDir + "\\" + nombre + ".java";
+			Iterable<String> compilationOptions = compileOptions;
 			
-				archivoOUT = Configuracion.getInstancia().carpetaOrigenBIN() + paqueteDir + "\\" + nombre + ".class";
-				System.out.println("Compilando archivo: " + archivoIN + "\n a:" + archivoOUT);
-			}else
-			{
-				archivoIN = Configuracion.getInstancia().carpetaOrigenSRC() +  nombre + ".java";
-				
-				archivoOUT = Configuracion.getInstancia().carpetaOrigenBIN() + nombre + ".class";
-				System.out.println("Compilando archivo: " + archivoIN + "\n a: " + archivoOUT);
-			}
-		}catch(Exception e)
-		{
-			System.out.println("ERROR OBTENIENDO SRC: "+e);
-		}
-//		TODO ESTO NO ANDA!!!!!
-//		
-//		JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-//		DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-//		StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null, null);
-//		Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromStrings(Arrays.asList("C:\\Ciudad.java"));
-//		JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, null, null, compilationUnits);
-//		boolean success = task.call();
-//		try {
-//			fileManager.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
+			JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+			//System.out.println("PASE Java Compiler");
+			DiagnosticCollector<JavaFileObject> diagnostics=null;
+			diagnostics = new DiagnosticCollector<>();
+			//System.out.println("PASE Java Diagnostic");
+			StandardJavaFileManager fileManager=null;
+			
+			if(compiler==null)
+				System.out.println("COMPILER Diagnostic NULL");
+			else
+				fileManager = compiler.getStandardFileManager(diagnostics, null, null);
+			
+			//System.out.println("PASE file manager");
+			
+			Iterable<? extends JavaFileObject> compilationUnits = fileManager.getJavaFileObjectsFromStrings(javaSTRFiles);
+			JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, compilationOptions, null, compilationUnits);
 
-
-//TODO 	Esto solo copia el compilado del proyecto de origen hay que sacarlo
-//		Si es que el proyecto Origen está compilado
-		String temp=null;
-		if(!paqueteDir.equals(""))
-		{
-		
-			 temp= Configuracion.getInstancia().carpetaOrigenBIN() + paqueteDir + "\\" + nombre + ".class";
-		}
-		else
-		{
-			temp = Configuracion.getInstancia().carpetaOrigenBIN() + nombre + ".class";
+//			success = task.call();
+			task.call();
+			fileManager.close();
+			System.out.println("Compilado terminado");
+	
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("Fallo compilar: "+e.toString());
 		}
 		
-		Archivo file = new Archivo(temp);
-		file.copiarArchivo(archivoOUT);
-		
-		//System.out.println("TEMP: "+temp);
 	}
 	
-	//public Class<?> instanciar(){
-	public Class instanciar(){
-		//Class<?> ret = null;
-		Class ret = null;
+	@SuppressWarnings({ "resource"})
+	public Class<?> instanciar(){
+		Class<?> ret = null;
 		URLClassLoader cl = null;
 		URL[] urlList = new URL[1];
 		try 
 		{
-//	TODO	Una vez que compile ... aca tiene que ir el proyecto de destino 
-			String strFile=workspace + "\\" + proyecto;
+			String strFile=workspace + File.separatorChar + proyecto;
 			
 			System.out.println("\n**STRFILE: "+strFile);
 			
@@ -134,36 +122,42 @@ public class AnalizadorJava {
 			else
 				System.out.println("URL: "+file.toURI().toURL());
 			*/
-			urlList[0] = new URL(file.toURI().toURL(),"bin\\");
+			paquete="src/main/java/tap/generated/code";	//hardcodeado
+			//urlList[0] = new URL(file.toURI().toURL(),"bin" + File.separatorChar);
+			urlList[0] = new URL(file.toURI().toURL(),paquete + File.separatorChar);
 			
 			System.out.println("URL LIST: "+urlList[0]);
 			
 			cl = new URLClassLoader(urlList);
-			if(cl==null)
-				System.out.println("CL NULL");
+//			if (cl == null) System.out.println("Class loader NULL");
 			
 			System.out.println("paquete: "+paquete);
 			System.out.println("NOMBREPAC: "+nombre);
 			
 			System.out.println("GETFILE: "+urlList[0]+nombre+".class" );
 			File file2=null;
+			char sep = File.separatorChar;
 			if(!paquete.equals(""))
-				file2 = new File(strFile+"//"+"bin//"+paquete+"//"+nombre+".class");
+				//file2 = new File(strFile + sep + "bin" + sep + paquete + sep + nombre + ".class");
+				file2 = new File(strFile + sep  + paquete + sep + nombre + ".class");
 			else
-				file2= new File(strFile+"//"+"bin//"+nombre+".class");
+				file2= new File(strFile + sep +  nombre + ".class");
+				//file2= new File(strFile + sep + "bin" + sep + nombre + ".class");
 				
 			
 			//File file2 = new File(urlList[0]+nombre+".class");
 			System.out.println("\n**PATH: "+ file2.getAbsolutePath() +" -\nLEN: "+file2.length() );
 			if(file2.length()<=0)
+			{
+				System.out.println("****EL .CLASS ES 0 ");
 				return null;
+			}
 			
-			
+			paquete="tap.generated.code";
 			if(!paquete.equals(""))				
 				ret = cl.loadClass(paquete + "." + nombre);
 			else
 			{	
-				//ret = cl.loadClass("default package" +"." + nombre);
 				ret = cl.loadClass(nombre);
 			}
 		} catch (MalformedURLException | ClassNotFoundException e) {
@@ -212,7 +206,6 @@ public class AnalizadorJava {
 	
 	public void annotationGet(Method metodo){
 		System.out.println("GET");
-		//TODO ver que hace
 		int iAux = 0;
 		
 		// Agregando Metodo
@@ -280,7 +273,7 @@ public class AnalizadorJava {
 	}
 	
 	//public void procesar(Class<?> clase){
-	public void procesar(Class clase){
+	public void procesar(Class<?> clase){
 //	TODO	Si no hay mas anotaciones en la clase mas que service se puede reemplazar
 //			tanto el for como el if siguientes!!!!
 //			if (clase.isAnnotationPresent(Servicio.class)){}
@@ -291,14 +284,16 @@ public class AnalizadorJava {
 			if (anotacion instanceof Servicio){
 				try
 				{
+					Configuracion Conf = Configuracion.getInstancia();
 					String strArchivojava=clase.getSimpleName() + "Serve";
-					System.out.println("ARCHIVOJAVA: "+strArchivojava+" PAQUETE:"+Configuracion.getInstancia().getPaqueteGenerado());
-					file = new ArchivoJava(strArchivojava, Configuracion.getInstancia().getPaqueteGenerado());
+					System.out.println("ARCHIVOJAVA: "+strArchivojava+" PAQUETE:"+Conf.getPaqueteGenerado());
+					file = new ArchivoJava(strArchivojava, Conf.getPaqueteGenerado());
 					//file = new ArchivoJava(strArchivojava, "tap.generated.server");
 					
-					file.addInclude("tap.generated.code.*");
+					//file.addInclude(Conf.Carpeta2Pack(Conf.carpetaDestinoSRC()));
 					//file.addInclude(clase.getName());
 					//------annotations lib
+					file.addInclude("tap.generated.code.*");
 					file.addInclude("javax.ws.rs.GET");
 					file.addInclude("javax.ws.rs.POST");
 					file.addInclude("javax.ws.rs.Path");
@@ -330,20 +325,48 @@ public class AnalizadorJava {
 		}
 	}
 
-	public void copiarArchivoDestino()
-	{
-		
-		Configuracion conf = Configuracion.getInstancia();
-		
-		//System.out.println("{copiarArchivoDest} - PAK: "+paqueteDir + " - NOMBRE: "+nombre);		
-		String origen = conf.carpetaOrigenSRC() + paqueteDir + "\\" + nombre + ".java";
-		System.out.println("--"+origen);
-//		String destino = conf.carpetaDestinoSRC() + paqueteDir + "\\" + nombre + ".java";		
-		String destino = conf.carpetaDestinoSRC() + "main\\java\\tap\\generated\\code\\" + nombre + ".java";;		
-		//System.out.println("{copiarArchivoDest} - ORIGEN: "+origen + " - DESTIINO: "+destino);
-		System.out.println("--"+destino);
-		Archivo file = new Archivo(origen);
-		
-		file.copiarArchivo(destino);
+	public static void copiarArchivosDestino(ArrayList<String> lista, String carpetaDestino){
+		String destino = null;
+		String linea = null;
+		String paquete = null;
+		System.out.println("Destino: "+carpetaDestino);
+		//System.out.println("PATH COPIAR: "+lista.get(1));
+		for (String origen: lista){
+			try{
+				System.out.println("Origen: "+origen);
+				ArchivoLectura in = new ArchivoLectura(origen);
+				
+				destino = carpetaDestino + File.separatorChar + in.getNombreCompleto();				
+				
+				//System.out.println("COPIANDO ARCHIVO con (" + (linea.substring(0, 7)) + ") de "+ origen + "-->" + destino);
+				System.out.println("COPIANDO ARCHIVO "+ destino);
+				ArchivoEscritura out = new ArchivoEscritura(destino, false);
+				
+				out.escribir("package " + "tap.generated.code"+";");
+				while(!in.eof()){
+					linea = in.getLineaActual();
+					
+					if(linea.length()>7)
+					{
+						//System.out.println("LINEA: "+ linea);
+						if ((linea.substring(0, 7)).equalsIgnoreCase("package")) 
+							//linea = "package " + "tap.generated.code"+";";
+						//linea = "package " + paquete+";";
+							linea = " ";
+						
+						
+					}
+					linea+="\n";
+					out.escribir(linea);
+					in.next();
+				}
+				in.cerrar();
+				out.cerrar();
+			}catch(IOException e){
+//				TODO ver que va aca!!!!
+				System.out.println("NO ENCONTRE ALGO");
+			}
+
+		}
 	}
 }

@@ -12,8 +12,17 @@ public class ArchivoLectura extends Archivo {
 	public boolean eof(){return (linea == null);}
 	
 	public void abrir() throws FileNotFoundException{
+		try
+		{
+		
 		fr = new FileReader(this.archivo);
 		br = new BufferedReader(fr);
+		
+		//System.out.println("Size: "+fr.read());
+		}catch(Exception e)
+		{
+			System.out.println("Exception: "+" no encontro archivo origen");
+		}
 	}
 	
 	public String getLineaActual(){return linea;}
@@ -29,8 +38,9 @@ public class ArchivoLectura extends Archivo {
 		br.close();
 	}
 
-	public ArchivoLectura(String file) throws FileNotFoundException {
+	public ArchivoLectura(String file) throws IOException {
 		super(file);
 		this.abrir();
+		this.next();
 	}
 }
