@@ -16,6 +16,7 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 
+import Annotation.Consumes;
 import Annotation.Get;
 import Annotation.Path;
 import Annotation.Post;
@@ -109,26 +110,53 @@ public class AnalizadorJava {
 		Class<?> ret = null;
 		URLClassLoader cl = null;
 		URL[] urlList = new URL[1];
-		try 
+		Class<?> urlClass = null;
+		
+		try
 		{
-			String strFile=workspace + File.separatorChar + proyecto;
-			
+			String strFile=workspace + File.separatorChar + proyecto+"/src/main/java/";
 			System.out.println("\n**STRFILE: "+strFile);
 			
 			File file = new File(strFile);
+			
+			URL url = file.toURI().toURL();          // file:/c:/myclasses/
+		    URL[] urls = new URL[]{url};
+	
+		    // Create a new class loader with the directory
+		    ClassLoader cll = new URLClassLoader(urls);
+	
+		    // Load in the class; MyClass.class should be located in
+		    // the directory file:/c:/myclasses/com/mycompany
+		    Class<?> cls = cll.loadClass("tap.generated.code."+nombre);
+		    return cls;
+		} catch (MalformedURLException | ClassNotFoundException e) {
+					
+					System.out.println("****Error al instanciar la clase: ");
+					e.printStackTrace();
+		}
+		return null;
 		/*
-			if(file==null)
-				System.out.println("FILE NULL");
-			else
-				System.out.println("URL: "+file.toURI().toURL());
-			*/
-			paquete="src/main/java/tap/generated/code";	//hardcodeado
+		try 
+		{
+			paquete="/src/main/java/tap/generated/code";	//hardcodeado
+			//paquete="/tap/generated/code";	//hardcodeado
+			//String strFile=workspace + File.separatorChar + proyecto+"\\src\\main\\java\\";
+			
+			//System.out.println("\n**FILESEPARATOR: "+File.separatorChar);
+			String strFile=workspace + File.separatorChar + proyecto+"/src/main/java/";
+			System.out.println("\n**STRFILE: "+strFile);
+			
+			File file = new File(strFile);
+		  
+			//paquete="src/main/java";	//hardcodeado
 			//urlList[0] = new URL(file.toURI().toURL(),"bin" + File.separatorChar);
-			urlList[0] = new URL(file.toURI().toURL(),paquete + File.separatorChar);
 			
-			System.out.println("URL LIST: "+urlList[0]);
-			
+			//urlList[0] = new URL(file.toURI().toURL(),paquete + File.separatorChar);
+			//urlList[0] = new URL(file.toURI().toURL(),paquete+File.separatorChar);
+			urlList[0] = file.toURI().toURL();
+			System.out.println("URL LIST: "+urlList[0]);			
 			cl = new URLClassLoader(urlList);
+			//cl = new URLClassLoader(urlList, getClass().getClassLoader());
 //			if (cl == null) System.out.println("Class loader NULL");
 			
 			System.out.println("paquete: "+paquete);
@@ -154,30 +182,31 @@ public class AnalizadorJava {
 			}
 			
 			paquete="tap.generated.code";
+						
+			System.out.println("POR BUSCAR LOAD CLASS: "+paquete + "." + nombre);
 			if(!paquete.equals(""))				
+			{	
 				ret = cl.loadClass(paquete + "." + nombre);
+				//ret = cl.loadClass(paquete + "." + nombre+".class");
+				//ret = cl.loadClass(paquete + "." + "Pedido");
+				//ret = cl.loadClass("C:\\Documents and Settings\\f.dellarosa.PPAR-PC12\\Mis documentos\\_DropboxOLD\\Public\\UP\\4 Año 1 Cuatri\\Tecnicas avanzadas de prog\\Rposi\\ProgTecAvanzadas\\trunk\\wor\\RESTServer\\src\\main\\java\\tap\\generated\\code" + "\\Pedido.class");
+				//ret = cl.loadClass(nombre);
+			}
 			else
 			{	
 				ret = cl.loadClass(nombre);
 			}
 		} catch (MalformedURLException | ClassNotFoundException e) {
+			
 			System.out.println("****Error al instanciar la clase: ");
 			e.printStackTrace();
-		} finally{
-			/*try {
-				if (cl != null) 
-				{	;//cl.close();					
-				}
-				
-			} catch (IOException e) {
-				System.out.println("EXCPTION INSTANCIA: "+e);
-				e.printStackTrace();
-			}
-			*/
+		} finally{			
 			System.out.println("PASEFIN");
 		}
 	
+		//return urlClass;
 		return ret;
+		*/
 	}
 	
 	private void annotationPOST(Method metodo){
@@ -185,7 +214,8 @@ public class AnalizadorJava {
 		int iAux = 0;
 		
 		// Agregando Metodo
-		file.addMetodo(file.visibilidadPublic(), metodo.getReturnType(), metodo.getName(),"@POST");
+		//file.addMetodo(file.visibilidadPublic(), metodo.getReturnType(), metodo.getName(),"@POST");
+		file.addMetodo(file.visibilidadPublic(), metodo.getReturnType(), metodo.getName(),"@POST\n@Path(\"/psj\")\n@Consumes(MediaType.APPLICATION_JSON)\n@Produces(MediaType.TEXT_PLAIN)");
 		
 		// Agregando Argumentos
 		iAux = 0;
@@ -209,7 +239,7 @@ public class AnalizadorJava {
 		int iAux = 0;
 		
 		// Agregando Metodo
-		file.addMetodo(file.visibilidadPublic(), metodo.getReturnType(), metodo.getName(),"@GET");
+		file.addMetodo(file.visibilidadPublic(), metodo.getReturnType(), metodo.getName(),"@GET\n@Path(\"/json\")\n@Produces(MediaType.APPLICATION_JSON)\n");
 		
 		// Agregando Argumentos
 		iAux = 0;
@@ -297,6 +327,9 @@ public class AnalizadorJava {
 					file.addInclude("javax.ws.rs.GET");
 					file.addInclude("javax.ws.rs.POST");
 					file.addInclude("javax.ws.rs.Path");
+					file.addInclude("javax.ws.rs.Consumes");
+					file.addInclude("javax.ws.rs.core.MediaType");
+					file.addInclude("javax.ws.rs.Produces");
 					
 					//file.addInclude(clase.getName());
 					

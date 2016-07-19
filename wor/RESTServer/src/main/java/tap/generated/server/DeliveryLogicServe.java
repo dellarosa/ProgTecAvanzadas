@@ -15,8 +15,9 @@ import tap.generated.code.*;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.Produces;
 
 
 @Path("/service")
@@ -34,14 +35,18 @@ public class DeliveryLogicServe{
 
 // METODOS
 	@POST
-	public boolean hacerAlgo(Pedido arg0) {
-		return original.hacerAlgo(arg0);
+@Path("/psj")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.TEXT_PLAIN)
+	public String EnviarPedido(Pedido arg0) {
+		return original.EnviarPedido(arg0);
 	}
 
 	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	public String obtenerPedido(Pedido arg0) {
-		return original.obtenerPedido(arg0);
+@Path("/json")
+@Produces(MediaType.APPLICATION_JSON)
+public Pedido obtenerPedido() {
+		return original.obtenerPedido();
 	}
 
 }

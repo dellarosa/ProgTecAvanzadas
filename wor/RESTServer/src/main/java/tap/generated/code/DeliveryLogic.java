@@ -5,27 +5,42 @@ package tap.generated.code;
 import Annotation.Get;
 import Annotation.Post;
 import Annotation.Servicio;
-
-
-
+import Annotation.Consumes;
 
 //@DatabaseTable(tableName = "delivery")
 @Servicio(servicio = "")
 public class DeliveryLogic {
 	
 	@Post(post="")
-	public boolean hacerAlgo(Pedido p1)
+	//@Path("/psj")
+	//@Consumes(MediaType.APPLICATION_JSON)
+	//@Consumes("application/json")
+    //@Produces(MediaType.TEXT_PLAIN)
+	public String EnviarPedido(Pedido p1)
 	//public boolean hacerAlgo()
-	{
+	{	String result="";
+		try
+		{
+			result = "cliente : " + p1.cliente;
+		}catch(Exception e)
+		{
+			System.out.println("ERROR POST");
+			return "ERROR";
+		}
 		System.out.println("HICE ALGO");
-		return true;
+		return "OK";
 	}
 
 	@Get(get="")
-	public String obtenerPedido(Pedido p1)
+	//@Path("/json")
+	//@Produces("application/json")
+    //@Produces(MediaType.APPLICATION_JSON)
+	public Pedido obtenerPedido()
 	//public boolean obtenerPedido()
 	{
+		Pedido p=new Pedido("fab","25");
 		
-		return "UN PAR DE LECHUGAS";
+		return p;
+		//return "UN PAR DE LECHUGAS";
 	}
 }

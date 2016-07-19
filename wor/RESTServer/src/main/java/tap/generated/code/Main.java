@@ -1,7 +1,5 @@
 package tap.generated.code;
 
-import java.sql.SQLException;
-
 
 /*
 import com.j256.ormlite.dao.Dao;
@@ -11,7 +9,6 @@ import com.j256.ormlite.support.ConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 
 */
-
 public class Main {
 
 	public final static String TAG="[·MAIN·] ";
@@ -21,10 +18,10 @@ public class Main {
 		
 	//	SupManager sp=new SupManager();
 		
-		Pedido p1=new Pedido("Juan",3);
+		Pedido p1=new Pedido("Juan","3");
 		
 		DeliveryLogic dl=new DeliveryLogic();
-		dl.hacerAlgo(p1);
+		dl.EnviarPedido(p1);
 		//sp.enviar(p1);
 		//DeliveryLogic.enviar(p1);
 		

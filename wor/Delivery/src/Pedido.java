@@ -2,42 +2,42 @@
 
 
 //@DatabaseTable(tableName = "pedidos")
+//@XmlRootElement
 public class Pedido {
 
-	public Pedido(String name,int cant)
+	public Pedido(String name,String cant)
 	{
 		setCantidad(cant);
 		setCliente(name);
 	}
 	//@DatabaseField(canBeNull = false)
-	public int id;
-	
-	public int getId() {
+	//@XmlElement(name="id")
+	public String id="1";	
+	public String getId() {
 		return id;
 	}
-
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
-	//@Seri(name="cantidad")	
-	public int cantidad;
-
-	public int getCantidad() {
+	//@Seri(name="cantidad")
+	//@XmlElement(name="cantidad")
+	public String cantidad;
+	public String getCantidad() {
 		return cantidad;
 	}
-
-	public void setCantidad(int cant) {
+	public void setCantidad(String cant) {
 		cantidad = cant;
 	}
 	
 	//@Seri(name="cliente")
-	public String cliente;
-
+	 //@XmlElement(name="cliente") 
+	 public String cliente;
+	 //@XmlElement(name="king") 
+	// public String name;	 
 	public String getCliente() {
 		return cliente;
 	}
-
 	public void setCliente(String cliente) {
 		this.cliente = cliente;
 	}
