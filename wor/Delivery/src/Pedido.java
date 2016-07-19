@@ -5,6 +5,10 @@
 //@XmlRootElement
 public class Pedido {
 
+	public Pedido()
+	{
+		
+	}
 	public Pedido(String name,String cant)
 	{
 		setCantidad(cant);
